@@ -7,7 +7,7 @@ files against a corpus.
 Its operation is described in:
 
 Julius Davies, Daniel M. German, Michael W. Godfrey and Abram
-Hindle. "EMSE: Software Bertillonage: Determining the Provenance of
+Hindle. "Software Bertillonage: Determining the Provenance of
 Software Development Artifacts", Journal of Empirical Software Engineering. To appear.
 
 and 
@@ -17,7 +17,10 @@ Hindle. "Software bertillonage: finding the provenance of an
 entity". Proceeding MSR '11 Proceedings of the 8th Working Conference
 on Mining Software Repositories. pp.183-192. http://dl.acm.org/citation.cfm?id=1985468
 
-We kindly ask that if you use Joa for research purposes, that we cite the above paper.
+We kindly ask that if you use Joa for research purposes, that we cite
+the first paper above.
+
+** License: GPLv2+
 
 Joa is licensed under the GPLv2 (or any later version).
 
