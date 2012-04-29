@@ -1,0 +1,131 @@
+* Joa
+
+Joa is a signature extractor for Java source and binary files. Joa can
+be very effective to match the provenance of java binary and source
+files against a corpus.
+
+Its operation is described in:
+
+Julius Davies, Daniel M. German, Michael W. Godfrey and Abram
+Hindle. "EMSE: Software Bertillonage: Determining the Provenance of
+Software Development Artifacts", Journal of Empirical Software Engineering. To appear.
+
+and 
+
+Julius Davies, Daniel M. German, Michael W. Godfrey and Abram
+Hindle. "Software bertillonage: finding the provenance of an
+entity". Proceeding MSR '11 Proceedings of the 8th Working Conference
+on Mining Software Repositories. pp.183-192. http://dl.acm.org/citation.cfm?id=1985468
+
+We kindly ask that if you use Joa for research purposes, that we cite the above paper.
+
+Joa is licensed under the GPLv2 (or any later version).
+
+** Building
+
+Simply run ant in the top directory
+
+** how to use
+
+The simplest way to run joa is to use the extractSig.sh script. Make
+sure java is found in the PATH
+
+#+BEGIN_EXAMPLE
+dmg@iodine:~/extProjects/sig-extractor$ ./extractSig.sh 
+Signature extractor version $Id: SimpleScan.java 248 2012-04-29 05:45:47Z dmg $
+
+Joa: extracts signatures from *.class and *.java.
+by Julius Davies and Daniel M. German, April 2012.
+
+Usage: [flags] [paths-to-examine...] 
+
+  --stdin            / -in   Reads paths from stdin.
+  --recursiveZip     / -rz   Process zips inside zips.
+  --hashOutput       / -ho   Each output line is: SHA1;FQN;PATH
+  --noFQN            / -nf   Class signature should not include FQN.
+
+  --sortOutput       / -so   Sorts output (all signatures) by FQN.
+  --sortInnerClasses / -si   Sorts inner-classes by name within each signature.
+  --sortMethods      / -sm   Sorts methods by name within each signature.
+  --sortFields       / -sf   Sorts fields by name within each signature.
+
+  --querySame        / -qs   Generates bin_2_bin / src_2_src SQL
+  --queryOther       / -qo   Generates bin_2_src / src_2_bin SQL.
+  --queryFileHashes  / -qh   Generates SQL based on file SHA1's.
+
+  Note: The '-queryOther/-qo' option takes precedence over '-querySame/-qs'.
+
+  If data is supplied on STDIN, the extractor assumes this contains a list
+  of paths separated by newlines (LF).  Paths supplied on the command-line
+  are ignored when STDIN has data.
+
+  Sorting the output ( -so / --sortOutput ) can require a lot of RAM.
+
+Java thinks it's allowed to use at most 871MB of RAM right now.
+#+END_EXAMPLE
+
+* Database
+
+Joa requires a corpus database. The easiest way to create it is to run
+extractSig.sh on each jar, zip, tar, war, etc. 
+
+You need to run extractSig.sh with, at least, the -ho output. This
+will generate an output:
+
+#+BEGIN_EXAMPLE
+----------------------------------------------------------------------
+I;Processing: aspectjrt-2.5.6.jar
+F;aspectjrt-2.5.6.jar;aspectjrt-2.5.6;.jar;-1;\N;a55e04ff1889efcf17061da55008018a1ecb1db0;\N;\N;\N;\N
+F;org/aspectj/internal/lang/annotation/;ajcDeclareAnnotation;.class;0;a55e04ff1889efcf17061da55008018a1ecb1db0;0b90c05c041a0d9fa788c05a27ac2339dbb18cd4;\N;\N;\N;\N
+S;0b90c05c041a0d9fa788c05a27ac2339dbb18cd4;ajcDeclareAnnotation;4eaaf455d1c2f4eb975c60dbd5f447622cf042f9;ba658ee5f085c35fd18e8268f8a1b6cb19d59f64
+F;org/aspectj/internal/lang/annotation/;ajcDeclareEoW;.class;0;a55e04ff1889efcf17061da55008018a1ecb1db0;11cc5b4f6f3d40ea0a07c1dad5f74ea0dc0d5e3d;\N;\N;\N;\N
+S;11cc5b4f6f3d40ea0a07c1dad5f74ea0dc0d5e3d;ajcDeclareEoW;add5546dfca2a0c72c3991e9163f08da371285dc;df8072f299630548d346018c922d38aec17081ef
+F;org/aspectj/internal/lang/annotation/;ajcDeclareParents;.class;0;a55e04ff1889efcf17061da55008018a1ecb1db0;7e4938752d5c96b1dc763efc15dfe1bc848f3730;\N;\N;\N;\N
+S;7e4938752d5c96b1dc763efc15dfe1bc848f3730;ajcDeclareParents;2e87dfd72e916e7b8ba0f49b0f9e682caaefd342;f153c93f4a51bf0cfbea3aa294fa25f795e0c3a8
+F;org/aspectj/internal/lang/annotation/;ajcDeclarePrecedence;.class;0;a55e04ff1889efcf17061da55008018a1ecb1db0;eb6dc0a80d2a2bbfdfa7d4188389548860ee2e3f;\N;\N;\N;\N
+...
+----------------------------------------------------------------------
+#+END_EXAMPLE
+
+Concatenate all the outputs from all the runs of extractSig.sh and
+then separate the File fields (starting with F) and the Signatures
+fields (starting with S). Now you have two files: files.txt and
+sigs.txt. Remove duplicates. Compress each using xz. You should end
+with a file called files.txt.xz and sigs.txt.xz
+
+Using postgres, create a database called maven. Run the script in
+db/bulk-load/loadData.sh 
+
+#+BEGIN_EXAMPLE
+Usage: ./loadData.sh [/path/to/files.xz] [/path/to/sigs.xz]
+
+PostgreSQL data loader for the Java Signature Extractor.
+by Julius Davies, Daniel M. German.  August 25, 2011.
+
+
+Note:  You must have a PostgreSQL database named "maven" already
+       created, and it must not require a password for the current
+       user (e.g., the command "psql maven" must work).
+#+END_EXAMPLE
+
+Depending on the size of your data, it might take few hours.
+
+* Querying the database
+
+Simply run
+
+./query.sh <path-to-jar> | psql maven
+
+query.sh takes options to the command line. They should match the
+options that you used during the extraction (for example, if you used
+-sf, or -sm).
+
+
+
+
+
+
+
+
+
+

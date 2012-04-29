@@ -1,0 +1,105 @@
+
+Timing data from Julius's Dell Vostro 3500 laptop (purchased in May 2010).
+---
+- Linux 3.1.0, Debian Unstable (Friday January 13th, 2012)
+- Core i3 M 350  @ 2.27GHz
+- 7200 RPM hard drive.
+
+$ time ./loadData.sh maven-august-2011/files.xz  maven-august-2011/sigs.xz  
+NOTICE:  table "files" does not exist, skipping
+DROP TABLE
+SET
+SET
+SET
+SET
+SET
+SET
+SET
+CREATE TABLE
+NOTICE:  table "sigs" does not exist, skipping
+DROP TABLE
+SET
+SET
+SET
+SET
+SET
+SET
+SET
+CREATE TABLE
+
+Tables loaded (sigs and files).
+Now creating indexes and tallies.
+It will take a few hours....
+
+              now              
+-------------------------------
+ 2012-01-12 11:53:17.948547-08
+(1 row)
+
+CREATE INDEX
+              now              
+-------------------------------
+ 2012-01-12 11:54:39.475395-08
+(1 row)
+
+CREATE INDEX
+              now              
+-------------------------------
+ 2012-01-12 11:57:05.748019-08
+(1 row)
+
+CREATE INDEX
+              now              
+-------------------------------
+ 2012-01-12 12:26:58.349594-08
+(1 row)
+
+CREATE INDEX
+              now              
+-------------------------------
+ 2012-01-12 13:16:24.548982-08
+(1 row)
+
+CREATE INDEX
+              now              
+-------------------------------
+ 2012-01-12 13:21:56.550127-08
+(1 row)
+
+UPDATE 130738
+              now              
+-------------------------------
+ 2012-01-12 14:20:54.061308-08
+(1 row)
+
+UPDATE 647763
+              now              
+-------------------------------
+ 2012-01-12 16:32:50.008711-08
+(1 row)
+
+  count   
+----------
+ 27851789
+(1 row)
+
+              now              
+-------------------------------
+ 2012-01-12 16:36:53.034728-08
+(1 row)
+
+  count  
+---------
+ 4087296
+(1 row)
+
+              now              
+-------------------------------
+ 2012-01-12 16:37:21.839977-08
+(1 row)
+
+
+real	296m32.069s
+user	6m42.773s
+sys	0m41.227s
+

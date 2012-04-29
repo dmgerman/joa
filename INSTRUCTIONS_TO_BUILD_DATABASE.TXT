@@ -1,0 +1,33 @@
+by Julius Davies, August 25th, 2011
+
+
+1.  Create a database called 'maven' in your PostgreSQL rdbms.
+
+2.  Make sure 'enable_seqscan = off' is set in your postgresql.conf
+    configuration file.  This is a non-default setting, so it is very
+    likely you will need to edit your postgresql config.
+
+    NOTE:  Our queries perform very, very badly if the query optimizer
+    is allowed to consider seqscans.
+
+3.  Make sure the current user can log into the 'maven' database without
+    specifying a password on the command line.  In other words, make sure
+    this command works:
+
+       psql maven
+
+4.  Obtain the 'files.xz' and 'sigs.xz' raw dumps of the extracted Maven
+    signatures.
+
+    They should be here (via scp/ssh):
+
+        tl.cs.uvic.ca:/opt/maven-signatures/*.xz
+
+5.  Run the data-loading script.  They are located inside
+    the './db/bulk-load/' of your 'sig-extractor' svn checkout:
+
+        cd ./db/bulk-load/
+        ./loadData.sh [path/to/files.xz] [path/to/sigs.xz]
+
+6.  Wait a couple hours for the scripts to finish!
+
