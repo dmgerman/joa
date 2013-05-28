@@ -122,8 +122,7 @@ Simply run
 #+END_EXAMPLE
 
 query.sh takes options to the command line. They should match the
-options that you used during the extraction (for example, if you used
--sf, or -sm).
+options that you used during the extraction (for example, if you used -sf, or -sm).
 
 
 
