@@ -117,7 +117,9 @@ Depending on the size of your data, it might take few hours.
 
 Simply run
 
+#+BEGIN_EXAMPLE
 ./query.sh <path-to-jar> | psql maven
+#+END_EXAMPLE
 
 query.sh takes options to the command line. They should match the
 options that you used during the extraction (for example, if you used
