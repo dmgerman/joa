@@ -11,14 +11,7 @@
 
     Default target: jar
 -->
-<project name="sig-extractor" default="jar" basedir=".">
-
-  <property name="httpclient-jar" value="commons-httpclient-3.0.jar"/>
-  <property name="log4j-jar" value="log4j-1.2.8.jar"/>
-  <property name="junit-jar" value="junit-3.8.1.jar"/>
-  <property name="ssl-jar" value="not-yet-commons-ssl-0.3.10-modified.jar"/>
-  <property name="logdriver-jar" value="logdriver-with-ms-1.0.1.jar"/>
-  <property name="servlet-jar" value="servlet-api.jar"/>
+<project name="sig-extractor" default="cp" basedir=".">
 
   <property name="src" location="./src/java"/>
   <property name="build" location="./build"/>
@@ -35,17 +28,11 @@
 
   <path id="compile-classpath">
     <fileset dir="lib">
-      <include name="**/*.jar"/>
+      <include name="*.jar"/>
     </fileset>
-
+    <pathelement location="."/>    
     <pathelement location="${classes}"/>
     <pathelement location="${test-classes}"/>            
-    <pathelement location="${lib}/${logdriver-jar}"/>
-    <pathelement location="${lib}/${httpclient-jar}"/>
-    <pathelement location="${lib}/${log4j-jar}"/>
-    <pathelement location="${lib}/${junit-jar}"/>
-    <pathelement location="${lib}/${ssl-jar}"/>
-    <pathelement location="${lib}/${servlet-jar}"/>
   </path>
 
   <target name="test-jar" depends="jar">
@@ -92,6 +79,8 @@
   </target>
 
   <target name="init">
+    <echo>${ant.version}</echo>
+    <echo>Java version: ${java.version}</echo>
     <tstamp>
       <format property="date" pattern="zzz:yyyy-MM-dd/HH:mm:ss" locale="en"/>
     </tstamp>
@@ -101,6 +90,7 @@
   <target name="javac" depends="init" description="Compiles java source code.">
     <mkdir dir="${classes}"/>
     <javac
+      compiler="extJavac"
       includeAntRuntime="false"
       destdir="${classes}"
       debug="true"
@@ -161,7 +151,16 @@
     <delete dir="${build}"/>
   </target>
 
-  <target name="all" depends="clean,jar"/>
+  <target name="all" depends="clean,jar,cp"/>
+
+  <target name="classpath" depends="cp"/>
+
+  <target name='cp' depends='jar' description='Generates classpath.sh file'>
+    <property name='classdump' refid='compile-classpath'/>
+    <echo file='classpath.sh'>export CLASSPATH=${classdump}
+</echo>
+    <echo>Created classpath.sh file.</echo>
+  </target>
 
 
 </project>

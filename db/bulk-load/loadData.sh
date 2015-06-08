@@ -21,19 +21,21 @@ f=`readlink -f $1`
 s=`readlink -f $2`
 cd $dirname
 
-echo 'DROP TABLE IF EXISTS files' | psql maven 
+export DB=little
 
-echo 'SELECT NOW()' | psql maven
+echo 'DROP TABLE IF EXISTS files' | psql $DB 
 
-unxz -c $f | cut -b 3- | cat files-definition.sql - end-data | psql maven  
+echo 'SELECT NOW()' | psql $DB 
 
-echo 'DROP TABLE IF EXISTS sigs' | psql maven
+unxz -c $f | cut -b 3- | cat files-definition.sql - end-data | psql $DB 
 
-echo 'SELECT NOW()' | psql maven
+echo 'DROP TABLE IF EXISTS sigs' | psql $DB
 
-unxz -c $s | cut -b 3- | cat sigs-definition.sql - end-data | psql maven
+echo 'SELECT NOW()' | psql $DB 
 
-echo 'SELECT NOW()' | psql maven
+unxz -c $s | cut -b 3- | cat sigs-definition.sql - end-data | psql $DB 
+
+echo 'SELECT NOW()' | psql $DB 
 
 echo ''
 echo 'Tables loaded (sigs and files).'
@@ -41,6 +43,6 @@ echo 'Now creating indexes and tallies.'
 echo 'It will take a few hours....'
 echo ''
 
-psql maven < ../prep.sql
+psql $DB < ../prep.sql
 
 

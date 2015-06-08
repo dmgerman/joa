@@ -53,12 +53,12 @@ public class Bin extends Artifact {
         }
     }
 
-    private static final int TYPE_CLASS = 1;
-    private static final int TYPE_METHOD = 2;
-    private static final int TYPE_FIELD = 3;
-    private static final String JAVA_LANG_OBJECT = "java/lang/Object";
-    private static final String JAVA_LANG_ANNOTATION = "java/lang/annotation/Annotation";
-    private static final String CONSTRUCTOR_NAME = "<init>";
+    public static final int TYPE_CLASS = 1;
+    public static final int TYPE_METHOD = 2;
+    public static final int TYPE_FIELD = 3;
+    public static final String JAVA_LANG_OBJECT = "java/lang/Object";
+    public static final String JAVA_LANG_ANNOTATION = "java/lang/annotation/Annotation";
+    public static final String CONSTRUCTOR_NAME = "<init>";
 
     /* raw data to help us reassemble the inner classes */
     private transient Map<String,NameAndBytes> allKnownInnerClasses = new TreeMap<String,NameAndBytes>();
@@ -365,22 +365,9 @@ public class Bin extends Artifact {
 
         buf.append(extractModifiers(TYPE_METHOD, access));
 
-        if (sig == null) {
-            sig = desc;
-        }
-        String returnSig = "";
-        String methodSig = sig;
-        if (sig != null) {
-            int x = sig.indexOf('(');
-            int y = sig.indexOf(')');
-            if (x >= 0) {
-                methodSig = sig.substring(x + 1, y);
-                returnSig = sig.substring(y + 1);
-            }
-
-            returnSig = signatureParser(returnSig);
-            methodSig = signatureParser(methodSig);
-        }
+        String[] s = methodSig(sig, desc);
+        String returnSig = s[0];
+        String methodSig = s[1];
 
         if (!CONSTRUCTOR_NAME.equals(name)) {
             buf.append(returnSig).append(" ");
@@ -406,6 +393,30 @@ public class Bin extends Artifact {
         }
         methodLines.add(new SignatureLine(name, buf.toString()));
         return null;
+    }
+
+    public static String[] methodSig(String sig, String desc) {
+        return methodSig(sig, desc, true);
+    }
+
+    public static String[] methodSig(String sig, String desc, boolean strip) {
+        if (sig == null) {
+            sig = desc;
+        }
+        String returnSig = "";
+        String methodSig = sig;
+        if (sig != null) {
+            int x = sig.indexOf('(');
+            int y = sig.indexOf(')');
+            if (x >= 0) {
+                methodSig = sig.substring(x + 1, y);
+                returnSig = sig.substring(y + 1);
+            }
+
+            returnSig = signatureParser(returnSig, strip);
+            methodSig = signatureParser(methodSig, strip);
+        }
+        return new String[]{returnSig, methodSig};
     }
 
     public static String extractModifiers(int type, int access) {
@@ -437,9 +448,15 @@ public class Bin extends Artifact {
         return buf.toString();
     }
 
-    private static strictfp boolean is(int flag, int var) { return (flag & var) != 0; }
+    public static boolean is(int flag, int var) { return (flag & var) != 0; }
 
-    private static String genericParser(String generic) {
+    public static boolean any(int flag1, int flag2, int var) { return any(flag1, flag2, 0, var); }
+
+    public static boolean any(int flag1, int flag2, int flag3, int var) {
+        return ((flag1 | flag2 | flag3) & var) != 0;
+    }
+
+    public static String genericParser(String generic) {
         if (generic != null) {
             StringBuilder buf = new StringBuilder();
             generic = generic.substring(1, generic.length()-1);
@@ -474,7 +491,11 @@ public class Bin extends Artifact {
         return null;
     }
 
-    private static String signatureParser(String sig) {
+    public static String signatureParser(String sig) {
+        return signatureParser(sig, true);
+    }
+
+    public static String signatureParser(String sig, boolean strip) {
         if (sig == null || "".equals(sig)) {
             return "";
         }
@@ -493,11 +514,11 @@ public class Bin extends Artifact {
         }
 
         StringBuilder buf = new StringBuilder(sig.length());
-        signatureParser(sig, 0, buf);
+        signatureParser(sig, 0, buf, strip);
         return buf.toString();
     }
 
-    private static int firstComma(String sig, int pos) {
+    public static int firstComma(String sig, int pos) {
         for (int i = pos; i < sig.length(); i++) {
             char c = sig.charAt(i);
             if (c == '<') {
@@ -509,12 +530,12 @@ public class Bin extends Artifact {
         throw new RuntimeException("Could not find firstComma: [" + sig + "]");
     }
 
-    private static int signatureParser(String sig, int pos, StringBuilder buf) {
+    private static int signatureParser(String sig, int pos, StringBuilder buf, boolean strip) {
         for (int i = pos; i < sig.length(); i++) {
             char c = sig.charAt(i);
             switch (c) {
                 case ';': {
-                    int bracketCount = toJavaType(sig.substring(pos, i), buf);
+                    int bracketCount = toJavaType(sig.substring(pos, i), buf, strip);
                     appendBrackets(bracketCount, buf);
                     if (sig.length() > i + 1 && sig.charAt(i + 1) != '>') {
                         buf.append(',');
@@ -523,9 +544,9 @@ public class Bin extends Artifact {
                 }
                 break;
                 case '<': {
-                    int bracketCount = toJavaType(sig.substring(pos, i), buf);
+                    int bracketCount = toJavaType(sig.substring(pos, i), buf, strip);
                     buf.append('<');
-                    i = signatureParser(sig, i+1, buf);
+                    i = signatureParser(sig, i+1, buf, strip);
                     buf.append('>');
                     appendBrackets(bracketCount, buf);
                     pos = i;
@@ -539,7 +560,7 @@ public class Bin extends Artifact {
         return sig.length();
     }
 
-    private static int toJavaType(String t, StringBuilder buf) {
+    private static int toJavaType(String t, StringBuilder buf, boolean strip) {
         boolean isFirstToken = true;
         int bracketCount = 0;
         boolean hasGenericWildcard = false;
@@ -560,33 +581,15 @@ public class Bin extends Artifact {
                     tok = t.substring(i+1, x);
                     i = x+1;
                     break;
-                case 'Z':
-                    tok = "boolean";
-                    break;
-                case 'B':
-                    tok = "byte";
-                    break;
-                case 'S':
-                    tok = "short";
-                    break;
-                case 'C':
-                    tok = "char";
-                    break;
-                case 'I':
-                    tok = "int";
-                    break;
-                case 'J':
-                    tok = "long";
-                    break;
-                case 'F':
-                    tok = "float";
-                    break;
-                case 'D':
-                    tok = "double";
-                    break;
-                case 'V':
-                    tok = "void";
-                    break;
+                case 'Z': tok = "boolean"; break;
+                case 'B': tok = "byte"; break;
+                case 'S': tok = "short"; break;
+                case 'C': tok = "char"; break;
+                case 'I': tok = "int"; break;
+                case 'J': tok = "long"; break;
+                case 'F': tok = "float"; break;
+                case 'D': tok = "double"; break;
+                case 'V': tok = "void"; break;
                 case '+':
                     hasGenericWildcard = true;
                     break;
@@ -597,7 +600,11 @@ public class Bin extends Artifact {
                     x = t.indexOf(';', i);
                     if (x < 0) { x = t.length(); }
                     tok = t.substring(i + 1, x);
-                    tok = Names.fixTypeName(tok);
+                    if (strip) {
+                        tok = Names.fixTypeName(tok);
+                    } else {
+                        tok = Names.fixClassName(tok);
+                    }
                     i = x+1;
                     break;
                 default:

@@ -7,7 +7,7 @@ files against a corpus.
 Its operation is described in:
 
 Julius Davies, Daniel M. German, Michael W. Godfrey and Abram
-Hindle. "Software Bertillonage: Determining the Provenance of
+Hindle. "EMSE: Software Bertillonage: Determining the Provenance of
 Software Development Artifacts", Journal of Empirical Software Engineering. To appear.
 
 and 
@@ -17,10 +17,7 @@ Hindle. "Software bertillonage: finding the provenance of an
 entity". Proceeding MSR '11 Proceedings of the 8th Working Conference
 on Mining Software Repositories. pp.183-192. http://dl.acm.org/citation.cfm?id=1985468
 
-We kindly ask that if you use Joa for research purposes, that we cite
-the first paper above.
-
-** License: GPLv2+
+We kindly ask that if you use Joa for research purposes, that we cite the above paper.
 
 Joa is licensed under the GPLv2 (or any later version).
 
@@ -117,12 +114,11 @@ Depending on the size of your data, it might take few hours.
 
 Simply run
 
-#+BEGIN_EXAMPLE
 ./query.sh <path-to-jar> | psql maven
-#+END_EXAMPLE
 
 query.sh takes options to the command line. They should match the
-options that you used during the extraction (for example, if you used -sf, or -sm).
+options that you used during the extraction (for example, if you used
+-sf, or -sm).
 
 
 

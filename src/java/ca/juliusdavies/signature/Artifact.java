@@ -1,27 +1,8 @@
-/*
-
-Copyright 2011, 2012 Julius Davies and Daniel M German
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
-*/
 package ca.juliusdavies.signature;
 
 import ca.phonelist.util.Hash;
 import ca.phonelist.util.Strings;
-import org.objectweb.asm.commons.EmptyVisitor;
+import org.objectweb.asm.tree.ClassNode;
 
 import java.util.Date;
 import java.util.Locale;
@@ -30,7 +11,7 @@ import java.util.Locale;
  * @author Julius Davies
  * @since Apr 18, 2010
  */
-public abstract class Artifact extends EmptyVisitor implements Comparable<Artifact> {
+public abstract class Artifact extends ClassNode implements Comparable<Artifact> {
 
     protected long date;
     protected String tarName;

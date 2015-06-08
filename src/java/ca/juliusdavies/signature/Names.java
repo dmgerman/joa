@@ -27,8 +27,8 @@ public class Names {
         return x >= 0 ? path.substring(x+1) : path;
     }
 
-    public static String fixClassName(String className) {
-        return className.replace('/', '.').replace('$', '.');
+    public static String fixClassName(String s) {
+        return s != null ? s.replace('/', '.').replace('$', '.') : s;
     }
 
 
@@ -93,7 +93,7 @@ public class Names {
         throw new RuntimeException("Could not findOpeningBracket: [" + sig + "] / pos=" + pos);
     }
 
-    static int findClosingBracket(String sig, int pos) {
+    public static int findClosingBracket(String sig, int pos) {
         for (int i = pos; i < sig.length(); i++) {
             char c = sig.charAt(i);
             if (c == '<') {
