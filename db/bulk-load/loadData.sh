@@ -21,7 +21,7 @@ f=`readlink -f $1`
 s=`readlink -f $2`
 cd $dirname
 
-export DB=little
+export DB=maven
 
 echo 'DROP TABLE IF EXISTS files' | psql $DB 
 

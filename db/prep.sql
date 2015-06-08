@@ -23,7 +23,7 @@ SELECT NOW();
 CREATE INDEX x23 ON files (basename VARCHAR_PATTERN_OPS);
 
 SELECT NOW();
-
+ 
 -- Update *.java tallies.
 UPDATE files SET uniqjavasigre = tally FROM (
   SELECT
@@ -33,7 +33,7 @@ UPDATE files SET uniqjavasigre = tally FROM (
   GROUP BY
     infilesha1
 ) t
-WHERE files.filesha1 = t.infilesha1 ;
+WHERE files.filesha1 = t.infilesha1 and files.uniqjavasigre is NULL;
 
 
 SELECT NOW();
@@ -47,7 +47,7 @@ UPDATE files SET uniqclasssigre = tally FROM (
   GROUP BY
     infilesha1
 ) t
-WHERE files.filesha1 = t.infilesha1 ;
+WHERE files.filesha1 = t.infilesha1 and files.uniqclasssigre IS NULL;
 
 SELECT NOW();
 SELECT COUNT(*) FROM files;
